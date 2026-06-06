@@ -148,8 +148,13 @@ public class CrudEngine {
         // Decouple service resolution via ServiceRegistry
         service = serviceRegistry.getService(entityClass, service);
 
-        // Wrap interceptors in a Composite Chain
-        List<CrudInterceptor<T>> list = (List<CrudInterceptor<T>>) (List<?>) interceptorsMap.getOrDefault(entityClass, new ArrayList<>());
+        // Wrap interceptors in a Composite Chain (including any assignable generic parent interceptors like BaseEntity)
+        List<CrudInterceptor<T>> list = new ArrayList<>();
+        for (Map.Entry<Class<?>, List<CrudInterceptor<?>>> entry : interceptorsMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(entityClass)) {
+                list.addAll((List<CrudInterceptor<T>>) (List<?>) entry.getValue());
+            }
+        }
         CrudInterceptor<T> interceptor = new CompositeCrudInterceptor<>(list);
         
         List<ResourceMetadata.FieldInfo> fieldMetadata = inspectFields(dtoClass);
