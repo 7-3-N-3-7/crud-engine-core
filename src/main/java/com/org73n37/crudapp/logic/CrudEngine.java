@@ -69,24 +69,15 @@ public class CrudEngine {
 
     public void discoverAndRegister(String packageName) {
         try {
-            String path = packageName.replace('.', '/');
-            Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(path);
-            while (urls.hasMoreElements()) {
-                URL resource = urls.nextElement();
-                File directory = new File(resource.getFile());
-                if (directory.exists()) {
-                    File[] files = directory.listFiles();
-                    if (files != null) {
-                        for (File file : files) {
-                            if (file.getName().endsWith(".class")) {
-                                String className = packageName + "." + file.getName().substring(0, file.getName().length() - 6);
-                                Class<?> clazz = Class.forName(className);
-                                if (clazz.isAnnotationPresent(CrudResource.class)) {
-                                    registerResource(clazz);
-                                }
-                            }
-                        }
-                    }
+            org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider scanner =
+                    new org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider(false);
+            scanner.addIncludeFilter(new org.springframework.core.type.filter.AnnotationTypeFilter(CrudResource.class));
+
+            for (org.springframework.beans.factory.config.BeanDefinition bd : scanner.findCandidateComponents(packageName)) {
+                String className = bd.getBeanClassName();
+                Class<?> clazz = Class.forName(className);
+                if (clazz.isAnnotationPresent(CrudResource.class)) {
+                    registerResource(clazz);
                 }
             }
         } catch (Exception e) {
