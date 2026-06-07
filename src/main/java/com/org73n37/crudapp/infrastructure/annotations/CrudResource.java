@@ -24,8 +24,13 @@ public @interface CrudResource {
     /**
      * 🔒 SECURITY OPTIMIZATION: Role-Based Access Control
      * List of roles required to access this resource.
+     *
+     * <p>Defaults to an <strong>empty array (deny-by-default)</strong>. A resource
+     * must explicitly opt in to the roles allowed to access it (for example
+     * {@code {"ANYONE"}}, {@code {"USER"}}, or {@code {"ADMIN"}}). This ensures a
+     * forgotten or unconfigured annotation can never accidentally expose data.
      */
-    String[] roles() default {"ANYONE", "USER", "ADMIN"};
+    String[] roles() default {};
 
     /**
      * 🚀 ARCHITECTURE OPTIMIZATION: DTO Versioning
