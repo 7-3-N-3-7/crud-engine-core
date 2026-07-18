@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  * [PERFORMANCE OPTIMIZATION]
  * Thread-safe cache for reflection metadata (fields, constructors, annotations)
@@ -19,12 +21,12 @@ public final class ReflectionCache {
 
     private ReflectionCache() {}
 
-    public static Field[] getDeclaredFields(Class<?> clazz) {
+    public static Field[] getDeclaredFields(@NotNull Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, Class::getDeclaredFields);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Constructor<T> getNoArgsConstructor(Class<T> clazz) {
+    public static <T> Constructor<T> getNoArgsConstructor(@NotNull Class<T> clazz) {
         return (Constructor<T>) constructorCache.computeIfAbsent(clazz, cl -> {
             try {
                 Constructor<?> ctor = cl.getDeclaredConstructor();
@@ -36,12 +38,12 @@ public final class ReflectionCache {
         });
     }
 
-    public static Annotation[] getAnnotations(Field field) {
+    public static Annotation[] getAnnotations(@NotNull Field field) {
         return fieldAnnotationCache.computeIfAbsent(field, Field::getAnnotations);
     }
 
     @SuppressWarnings("unchecked")
-    public static <A extends Annotation> A getAnnotation(Field field, Class<A> annotationClass) {
+    public static <A extends Annotation> A getAnnotation(@NotNull Field field, @NotNull Class<A> annotationClass) {
         for (Annotation ann : getAnnotations(field)) {
             if (ann.annotationType().equals(annotationClass)) {
                 return (A) ann;
