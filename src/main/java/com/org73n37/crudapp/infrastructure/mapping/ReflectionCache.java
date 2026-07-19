@@ -22,7 +22,7 @@ public final class ReflectionCache {
     private ReflectionCache() {}
 
     public static Field[] getDeclaredFields(@NotNull Class<?> clazz) {
-        return fieldCache.computeIfAbsent(clazz, Class::getDeclaredFields);
+        return fieldCache.computeIfAbsent(clazz, @NotNull Class::getDeclaredFields);
     }
 
     @SuppressWarnings("unchecked")
@@ -39,11 +39,11 @@ public final class ReflectionCache {
     }
 
     public static Annotation[] getAnnotations(@NotNull Field field) {
-        return fieldAnnotationCache.computeIfAbsent(field, Field::getAnnotations);
+        return fieldAnnotationCache.computeIfAbsent(field, @NotNull Field::getAnnotations);
     }
 
     @SuppressWarnings("unchecked")
-    public static <A extends Annotation> A getAnnotation(@NotNull Field field, @NotNull Class<A> annotationClass) {
+    public static <@NotNull A extends Annotation> A getAnnotation(@NotNull Field field, @NotNull Class<A> annotationClass) {
         for (Annotation ann : getAnnotations(field)) {
             if (ann.annotationType().equals(annotationClass)) {
                 return (A) ann;
